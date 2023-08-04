@@ -1,5 +1,5 @@
 # Gestão de RH - Escopo
-- Cadastro de empresa [MESMA TELA DO ONBOARDING]
+[ ] - Cadastro de empresa [MESMA TELA DO ONBOARDING]
 - Login de usuário de RH da empresa parceira
 - Header do portal
 - Chat entre plataformas
