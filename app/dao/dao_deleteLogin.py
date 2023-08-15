@@ -1,12 +1,11 @@
 from app.dao.dao import connect_database
 from app.schemas.adm import Adm
 
-def createLogin(id: int, adm: Adm):
+def deleteLogin(id: int):
 
     connection, cursor = connect_database()
 
-    query = f""" INSERT into adm_default(id, email, password)
-    VALUES ({id}, "{adm.email}", "{adm.password}")
+    query = f""" DELETE FROM adm_default WHERE id={id};
     """
 
     cursor.execute(query)
@@ -16,4 +15,4 @@ def createLogin(id: int, adm: Adm):
         cursor.close()
         connection.close()
 
-    return id, adm
+    return id

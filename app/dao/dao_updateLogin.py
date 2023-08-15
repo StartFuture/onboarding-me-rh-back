@@ -1,22 +1,20 @@
 from app.dao.dao import connect_database
+from app.schemas.adm import UpdateAdm
 
-def updateLogin(id: int):
+def updateLogin(id: int, adm: UpdateAdm):
 
     connection, cursor = connect_database()
 
-    query = f"""
-
+    query = f""" UPDATE adm_default
+    SET email="{adm.email}", password="{adm.password}" 
+    WHERE id={id}
     """
 
-# UPDATE Company
-# SET email = 'teste3@teste.com'
-# WHERE id=1
-# ;
-
     cursor.execute(query)
+    connection.commit()
 
-    # adm_list = cursor.fetchall()
+    if (connection.is_connected()):
+        cursor.close()
+        connection.close()
 
-    connection.close()
-
-    # return adm_list
+    return id, adm
