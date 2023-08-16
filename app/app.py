@@ -2,10 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.employee import router as router_employee
-from app.routes.route_get import route_get as router_get
-from app.routes.route_create import route_create as router_create
-from app.routes.route_update import route_update as router_update
-from app.routes.route_delete import route_delete as router_delete
+from app.routes.admin import router as router_admin
 
 app = FastAPI()
 
@@ -28,7 +25,4 @@ app.add_middleware(
 
 
 app.include_router(router=router_employee)
-app.include_router(router=router_get)
-app.include_router(router=router_create)
-app.include_router(router=router_update)
-app.include_router(router=router_delete)
+app.include_router(router=router_admin)
