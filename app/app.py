@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.employee import router as router_employee
 from app.routes.admin import router as router_admin
+from app.routes.company import router as router_company
 
 app = FastAPI()
 
@@ -26,3 +27,4 @@ app.add_middleware(
 
 app.include_router(router=router_employee)
 app.include_router(router=router_admin)
+app.include_router(router=router_company)

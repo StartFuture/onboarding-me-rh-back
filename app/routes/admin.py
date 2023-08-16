@@ -11,17 +11,15 @@ router = APIRouter(
     ]
 )
     
-@router.post('/create-adm/{adm_id}')
-def create_adm(adm_id: int, adm_info: Adm):
+@router.post('/create-adm/')
+def create_adm(adm_info: Adm):
     adm_list = getAll()
 
     for adm in adm_list:
-        if (adm_id == adm['id']):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID already exists")
-        elif (adm_info.email == adm['email']):
+        if (adm_info.email == adm['email']):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
         
-    adm = createLogin(adm_id, adm_info)
+    adm = createLogin(adm_info)
     adm_json = jsonable_encoder(adm)
     return JSONResponse(status_code=status.HTTP_200_OK, content=adm_json)
 

@@ -1,12 +1,12 @@
 from app.dao.dao import connect_database
 from app.schemas.admin import Adm, UpdateAdm
 
-def createLogin(id: int, adm: Adm):
+def createLogin(adm: Adm):
 
     connection, cursor = connect_database()
 
-    query = f""" INSERT into adm_default(id, email, password)
-    VALUES ({id}, "{adm.email}", "{adm.password}")
+    query = f""" INSERT into adm_default(email, password)
+    VALUES ("{adm.email}", "{adm.password}")
     """
 
     cursor.execute(query)
@@ -16,7 +16,7 @@ def createLogin(id: int, adm: Adm):
         cursor.close()
         connection.close()
 
-    return id, adm
+    return adm
 
 def getAll():
 
