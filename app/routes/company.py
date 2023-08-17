@@ -17,6 +17,8 @@ def create_company(company_info: Company):
 
     if company_info.company_name == "":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Company Name")
+    if company_info.trading_name == "":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Trading Name")
     if company_info.company_password == "":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Company Password")
 

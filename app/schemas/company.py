@@ -4,7 +4,7 @@ from typing import Optional
 
 class Company(BaseModel):
     company_name: str
-    trading_name: Optional[str]
+    trading_name: str
     logo: Optional[bytes]
     cnpj: str = Field(pattern=r'^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}\-?\d{2}$')
     email: EmailStr
