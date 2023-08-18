@@ -1,5 +1,5 @@
 from app.dao.dao import connect_database
-from app.schemas.company import Company, CompanyUpdate
+from app.schemas.company import Company, CompanyUpdate, CompanyUpdateLogin
 
 def createCompany(company: Company):
 
@@ -77,6 +77,28 @@ def updateCompany(id: int, company: CompanyUpdate):
     state_register="{company.state_register}" 
     WHERE id={id}
     """
+
+    cursor.execute(query)
+    connection.commit()
+
+    if (connection.is_connected()):
+        cursor.close()
+        connection.close()
+
+    return id, company
+
+def updateCompanyLogin(id: int, company: CompanyUpdateLogin):
+
+    connection, cursor = connect_database()
+
+    query = f"""UPDATE Company
+    SET
+    email="{company.email}",
+    company_password="{company.company_password}"
+    WHERE id={id}
+    """
+
+    print(query)
 
     cursor.execute(query)
     connection.commit()

@@ -19,3 +19,7 @@ class CompanyUpdate(BaseModel):
     email: Optional[EmailStr]
     company_password: Optional[str]
     state_register: Optional[str] = Query(..., max_length=14)
+
+class CompanyUpdateLogin(BaseModel):
+    email: Optional[EmailStr]
+    company_password: Optional[str]

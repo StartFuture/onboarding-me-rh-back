@@ -111,7 +111,7 @@ def update_employee(employee_id: int, employee_info: EmployeeUpdate):
     return JSONResponse(status_code=status.HTTP_200_OK, content=employee_json)
 
 @router.put('/update-employeeLogin/{employee_id}')
-def update_employee(employee_id: int, employee_info: EmployeeUpdateLogin):
+def update_employeeLogin(employee_id: int, employee_info: EmployeeUpdateLogin):
     employee_listOne = getOne(employee_id)
 
     if employee_info.email == None:
@@ -129,7 +129,7 @@ def update_employee(employee_id: int, employee_info: EmployeeUpdateLogin):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password already exists")
 
     employee = updateEmployeeLogin(employee_id, employee_info)
-    return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"Employee ID {employee_id} updated"})
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"Login from Employee ID {employee_id} updated"})
 
 @router.delete('/delete-employee/{employee_id}')
 def delete_employee(employee_id: int):

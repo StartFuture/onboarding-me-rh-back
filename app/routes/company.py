@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status, HTTPException, Path
-from app.dao.dao_company import createCompany, getAll, getOne, updateCompany, deleteCompany
+from app.dao.dao_company import createCompany, getAll, getOne, updateCompany, updateCompanyLogin, deleteCompany
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from app.schemas.company import Company, CompanyUpdate
+from app.schemas.company import Company, CompanyUpdate, CompanyUpdateLogin
 
 router = APIRouter(
     prefix="/company",
@@ -86,6 +86,27 @@ def update_company(company_id: int, company_info: CompanyUpdate):
     company = updateCompany(company_id, company_info)
     company_json = jsonable_encoder(company)
     return JSONResponse(status_code=status.HTTP_200_OK, content=company_json)
+
+@router.put('/update-companyLogin/{company_id}')
+def update_companyLogin(company_id: int, company_info: CompanyUpdateLogin):
+    company_listOne = getOne(company_id)
+
+    if company_info.email == None:
+        company_info.email = company_listOne[0]['email']
+
+    if company_info.company_password == None:
+        company_info.company_password = company_listOne[0]['company_password']
+
+    company_listAll = getAll()
+
+    for company in company_listAll:
+        if (company_info.email == company['email']):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
+        elif (company_info.company_password == company['company_password']):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password already exists")
+
+    company = updateCompanyLogin(company_id, company_info)
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"Login from Company ID {company_id} updated"})
 
 @router.delete('/delete-company/{company_id}')
 def delete_company(company_id: int):
