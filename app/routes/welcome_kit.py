@@ -1,7 +1,8 @@
 from fastapi import APIRouter, status, HTTPException, Path
-from app.dao.dao_welcome_kit import createWelcomeKit, getOne, updateWelcomeKit, deleteWelcomeKit, createWelcomeKit_WKItem
+from app.dao.dao_welcome_kit import createWelcomeKit, updateWelcomeKit, deleteWelcomeKit, createWelcomeKit_WKItem
 from app.dao.dao_welcome_kit import getAll as getAllWk
-from app.dao.dao_welcome_kit_item import getAll as getAllItem
+from app.dao.dao_welcome_kit import getOne as getOneWk
+from app.dao.dao_welcome_kit_item import getOne as getOneItem
 from fastapi.responses import JSONResponse
 from app.schemas.welcome_kit import WelcomeKit
 from app.schemas.welcome_kit_wk_item import WelcomeKit_WKItem
@@ -33,7 +34,7 @@ def getAll_WK():
     
 @router.get('/getone-welcome-kit/{welcome_kit_id}')
 def get_WK(welcome_kit_id: int = Path(description="The ID of the Welcome Kit")):
-    welcome_kit_list = getOne(welcome_kit_id)
+    welcome_kit_list = getOneWk(welcome_kit_id)
 
     if welcome_kit_list:
         return welcome_kit_list
@@ -43,7 +44,7 @@ def get_WK(welcome_kit_id: int = Path(description="The ID of the Welcome Kit")):
 
 @router.put('/update-welcome-kit/{welcome_kit_id}')
 def update_WK(welcome_kit_id: int, welcome_kit_info: WelcomeKit):
-    welcome_kit_listOne = getOne(welcome_kit_id)
+    welcome_kit_listOne = getOneWk(welcome_kit_id)
 
     if welcome_kit_info.name == None:
         welcome_kit_info.name = welcome_kit_listOne[0]['name']
@@ -57,7 +58,7 @@ def update_WK(welcome_kit_id: int, welcome_kit_info: WelcomeKit):
 @router.delete('/delete-welcome-kit/{welcome_kit_id}')
 def delete_WK(welcome_kit_id: int):
 
-    welcome_kit_list = getOne(welcome_kit_id)
+    welcome_kit_list = getOneWk(welcome_kit_id)
 
     if len(welcome_kit_list) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
@@ -74,22 +75,18 @@ def create_WK_WKItem(wk_wkitem_info: WelcomeKit_WKItem):
     if wk_wkitem_info.item_id == "":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Item Id")
     
-    wk_list = getAllWk()
-    wk_item_list = getAllItem()
-    print(wk_list)
-    print(wk_item_list)
+    wk_list = getOneWk(wk_wkitem_info.welcome_kit_id)
+    wk_item_list = getOneItem(wk_wkitem_info.item_id)
 
-    for wk in wk_list:
-        if (wk_wkitem_info.welcome_kit_id == wk['id']):
-            print(wk)
-        else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Welcome Kit Id doesn't exist")
-        
-    for wk_item in wk_item_list:
-        if (wk_wkitem_info.item_id == wk_item['id']):
-            print(wk_item)
-        else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Item Id doesn't exist")   
+    if wk_list:
+        print(wk_list)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Welcome Kit Id doesn't exist"})
+    
+    if wk_item_list:
+        print(wk_item_list)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Item Id doesn't exist"}) 
 
     wk_wkitem = createWelcomeKit_WKItem(wk_wkitem_info)
     return wk_wkitem
