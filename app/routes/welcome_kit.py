@@ -1,7 +1,11 @@
 from fastapi import APIRouter, status, HTTPException, Path
-from app.dao.dao_welcome_kit import createWelcomeKit, getAll, getOne, updateWelcomeKit, deleteWelcomeKit
+from app.dao.dao_welcome_kit import createWelcomeKit, getOne, updateWelcomeKit, deleteWelcomeKit, createWelcomeKit_WKItem
+from app.dao.dao_welcome_kit import getAll as getAllWk
+from app.dao.dao_welcome_kit_item import getAll as getAllItem
 from fastapi.responses import JSONResponse
 from app.schemas.welcome_kit import WelcomeKit
+from app.schemas.welcome_kit_wk_item import WelcomeKit_WKItem
+
 
 router = APIRouter(
     prefix="/welcome-kit",
@@ -21,7 +25,7 @@ def create_WK(wk_info: WelcomeKit):
 
 @router.get('/getall-welcome-kit/')
 def getAll_WK():
-    welcome_kit_list = getAll()
+    welcome_kit_list = getAllWk()
     if welcome_kit_list:
         return welcome_kit_list
     else:
@@ -61,3 +65,31 @@ def delete_WK(welcome_kit_id: int):
         deleteWelcomeKit(welcome_kit_id)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"ID {welcome_kit_id} deleted"})
+
+@router.post('/create-welcome-kit-wkitem/')
+def create_WK_WKItem(wk_wkitem_info: WelcomeKit_WKItem):
+
+    if wk_wkitem_info.welcome_kit_id == "":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Welcome Kit Id")
+    if wk_wkitem_info.item_id == "":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Item Id")
+    
+    wk_list = getAllWk()
+    wk_item_list = getAllItem()
+    print(wk_list)
+    print(wk_item_list)
+
+    for wk in wk_list:
+        if (wk_wkitem_info.welcome_kit_id == wk['id']):
+            print(wk)
+        else:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Welcome Kit Id doesn't exist")
+        
+    for wk_item in wk_item_list:
+        if (wk_wkitem_info.item_id == wk_item['id']):
+            print(wk_item)
+        else:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Item Id doesn't exist")   
+
+    wk_wkitem = createWelcomeKit_WKItem(wk_wkitem_info)
+    return wk_wkitem
