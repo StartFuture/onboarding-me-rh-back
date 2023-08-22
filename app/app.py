@@ -1,6 +1,12 @@
-from app.routes.employee import router as router_employee
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.routes.employee import router as router_employee
+from app.routes.company import router as router_company
+from app.routes.email import router as router_email
+from app.routes.welcome_kit import router as router_welcome_kit
+from app.routes.welcome_kit_item import router as router_welcome_kit_item
+
 
 app = FastAPI()
 
@@ -9,6 +15,7 @@ origins = [
     "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:8080",
+    "http://localhost:3306"
     # "*"
 ]
 
@@ -22,3 +29,7 @@ app.add_middleware(
 
 
 app.include_router(router=router_employee)
+app.include_router(router=router_company)
+app.include_router(router=router_email)
+app.include_router(router=router_welcome_kit)
+app.include_router(router=router_welcome_kit_item)
