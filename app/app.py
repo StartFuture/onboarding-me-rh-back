@@ -6,6 +6,7 @@ from app.routes.company import router as router_company
 from app.routes.email import router as router_email
 from app.routes.welcome_kit import router as router_welcome_kit
 from app.routes.welcome_kit_item import router as router_welcome_kit_item
+from app.routes.welcome_kit_wk_item import router as router_welcome_kit_wk_item
 
 
 app = FastAPI()
@@ -33,3 +34,4 @@ app.include_router(router=router_company)
 app.include_router(router=router_email)
 app.include_router(router=router_welcome_kit)
 app.include_router(router=router_welcome_kit_item)
+app.include_router(router=router_welcome_kit_wk_item)
