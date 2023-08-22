@@ -8,7 +8,6 @@ from app.routes.welcome_kit import router as router_welcome_kit
 from app.routes.welcome_kit_item import router as router_welcome_kit_item
 from app.routes.welcome_kit_wk_item import router as router_welcome_kit_wk_item
 
-
 app = FastAPI()
 
 origins = [
