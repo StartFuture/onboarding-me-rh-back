@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status, HTTPException, Path
-from app.dao.dao_employee import createEmployee, getAll, getOne, updateEmployee, updateEmployeeLogin, deleteEmployee
+from app.dao.dao_employee import createEmployee, getAll, getOne, updateEmployee, updateEmployeeLogin, deleteEmployee, getEmployeeInfo, updateEmployeeInfo
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from app.schemas.employee import Employee, EmployeeUpdate, EmployeeUpdateLogin
+from app.schemas.employee import Employee, EmployeeUpdate, EmployeeUpdateLogin, EmployeeUpdateInfo
 
 from fastapi import APIRouter
 
@@ -57,6 +57,17 @@ def get_employee(employee_id: int = Path(description="The ID of the Employee")):
 
     if employee_list:
         return employee_list
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+    
+@router.get("/get-employee-info/{employee_id}")
+def get_employee_info(employee_id: int):
+    
+    employee = getEmployeeInfo(employee_id)
+    
+    if employee:
+        employee_json = jsonable_encoder(employee)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=employee_json)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
 
@@ -130,6 +141,55 @@ def update_employeeLogin(employee_id: int, employee_info: EmployeeUpdateLogin):
 
     employee = updateEmployeeLogin(employee_id, employee_info)
     return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"Login from Employee ID {employee_id} updated"})
+
+@router.put('/update-employee-info/{employee_id}')
+def update_employee_info(employee_id: int, employee_info: EmployeeUpdateInfo):
+    employee_listOne = getEmployeeInfo(employee_id)
+
+    if employee_info.first_name == None:
+        employee_info.first_name = employee_listOne[0]['first_name']
+    
+    if employee_info.surname == None:
+        employee_info.surname = employee_listOne[0]['surname']
+    
+    if employee_info.birthdate == None:
+        employee_info.birthdate = employee_listOne[0]['birthdate']
+
+    if employee_info.employee_role == None:
+        employee_info.employee_role = employee_listOne[0]['employee_role']
+
+    if employee_info.email == None:
+        employee_info.email = employee_listOne[0]['email']
+
+    if employee_info.phone_number == None:
+        employee_info.phone_number = employee_listOne[0]['phone_number']
+    
+    if employee_info.cpf == None:
+        employee_info.cpf = employee_listOne[0]['cpf']
+
+    if employee_info.street == None:
+        employee_info.street = employee_listOne[0]['street']
+
+    if employee_info.zipcode == None:
+        employee_info.zipcode = employee_listOne[0]['zipcode']
+
+    if employee_info.city == None:
+        employee_info.city = employee_listOne[0]['city']
+
+    if employee_info.state == None:
+        employee_info.state = employee_listOne[0]['state']    
+
+    employee_listAll = getAll()
+
+    for employee in employee_listAll:
+        if (employee_info.email == employee['email']):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
+        elif (employee_info.cpf == employee['cpf']):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="CPF already exists")
+
+    employee = updateEmployeeInfo(employee_id, employee_info)
+    employee_json = jsonable_encoder(employee)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=employee_json)
 
 @router.delete('/delete-employee/{employee_id}')
 def delete_employee(employee_id: int):
