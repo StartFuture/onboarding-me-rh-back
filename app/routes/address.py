@@ -27,7 +27,7 @@ def create_address(address_info: Address):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing City")
     if address_info.state == "":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing State")
-      
+    
     address = createAddress(address_info)
     address_json = jsonable_encoder(address)
     return JSONResponse(status_code=status.HTTP_200_OK, content=address_json)
@@ -45,7 +45,7 @@ def getOne_Address(address_id: int = Path(description="The ID of the Address")):
     address_list = getOne(address_id)
 
     if address_list:
-        return address_list
+        return JSONResponse(status_code=status.HTTP_200_OK, content=address_list)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
     

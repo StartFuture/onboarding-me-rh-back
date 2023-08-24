@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, Path
-from app.dao.dao_employee import createEmployee, getAll, getOne, updateEmployee, updateEmployeeLogin, deleteEmployee, getEmployeeInfo, updateEmployeeInfo
+from app.dao.dao_employee import createEmployee, getAll, getOne, updateEmployee, updateEmployeeLogin, deleteEmployee, getEmployeeInfo, getAllEmployeeInfo, updateEmployeeInfo
+from app.dao.dao_address import deleteAddress
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from app.schemas.employee import Employee, EmployeeUpdate, EmployeeUpdateLogin, EmployeeUpdateInfo
@@ -179,13 +180,27 @@ def update_employee_info(employee_id: int, employee_info: EmployeeUpdateInfo):
     if employee_info.state == None:
         employee_info.state = employee_listOne[0]['state']    
 
-    employee_listAll = getAll()
+    if employee_info.num == None:
+        employee_info.num = employee_listOne[0]['num']
+    
+    if employee_info.complement == None:
+        employee_info.complement = employee_listOne[0]['complement']
+
+    if employee_info.tracking_code == None:
+        employee_info.tracking_code = employee_listOne[0]['tracking_code']
+
+    if employee_info.status == None:
+        employee_info.status = employee_listOne[0]['status']
+
+    employee_listAll = getAllEmployeeInfo()
 
     for employee in employee_listAll:
         if (employee_info.email == employee['email']):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
         elif (employee_info.cpf == employee['cpf']):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="CPF already exists")
+        elif (employee_info.tracking_code == employee['tracking_code']):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tracking Code already exists")
 
     employee = updateEmployeeInfo(employee_id, employee_info)
     employee_json = jsonable_encoder(employee)
@@ -194,11 +209,21 @@ def update_employee_info(employee_id: int, employee_info: EmployeeUpdateInfo):
 @router.delete('/delete-employee/{employee_id}')
 def delete_employee(employee_id: int):
 
-    employee_list = getOne(employee_id)
+    employee_listOne = getOne(employee_id)
+    employee_listAll = getAll()
 
-    if len(employee_list) == 0:
+    if len(employee_listOne) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
     else:
         deleteEmployee(employee_id)
+
+    for employee in employee_listAll:
+
+        print("address id: ", employee_listOne[0]["address_id"])
+
+        if (employee_listOne[0]["address_id"] == employee['address_id']):
+            break
+        else:
+            deleteAddress(employee_listOne[0]["address_id"])
 
     return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"ID {employee_id} deleted"})

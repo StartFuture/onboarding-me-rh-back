@@ -8,6 +8,11 @@ class LevelAccessEnum(str, Enum):
     manager = 'manager'
     default = 'default'
 
+class StatusEnum(str, Enum):
+    to_be_send = 'to_be_send'
+    sended = 'sended'
+    delivered = 'delivered'
+
 class Employee(BaseModel):
     first_name: str
     surname: str
@@ -38,14 +43,18 @@ class EmployeeUpdateInfo(BaseModel):
     first_name: Optional[str]
     surname: Optional[str]
     cpf: Optional[str] = Field(pattern=r"^([0-9]){3}\.?([0-9]){3}\.?([0-9]){3}-?([0-9]){2}$")
-    employee_role: Optional[str]
     birthdate: Optional[date]
+    employee_role: Optional[str]
     email: Optional[EmailStr]
     phone_number: Optional[str] = Field(pattern=r"^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})\-?(\d{4}))$")
-    street: Optional[str]
     zipcode: Optional[str] = Field(pattern=r'^\d{5}\-?\d{3}$')
-    city: Optional[str]
     state: Optional[str]
+    city: Optional[str]
+    street: Optional[str]
+    num: Optional[str]
+    complement: Optional[str]
+    tracking_code: Optional[str]
+    status: Optional[StatusEnum]
 
 class EmployeeUpdateLogin(BaseModel):
     email: Optional[EmailStr]

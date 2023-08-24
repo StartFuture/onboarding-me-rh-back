@@ -1,212 +1,299 @@
 from app.dao.dao import connect_database
 from app.schemas.employee import Employee, EmployeeUpdate, EmployeeUpdateLogin, EmployeeUpdateInfo
+from mysql.connector import Error
 
 def createEmployee(employee: Employee):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    cpf = employee.cpf
-    cpf_tratado = cpf.replace(".","").replace("-","")
+        cpf = employee.cpf
+        cpf_tratado = cpf.replace(".","").replace("-","")
 
-    phone = employee.phone_number
-    phone_tratado = phone.replace("+","").replace("(", "").replace(")","").replace("-","")
+        phone = employee.phone_number
+        phone_tratado = phone.replace("+","").replace("(", "").replace(")","").replace("-","")
 
-    query = f""" INSERT into Employee(first_name, surname, birthdate, employee_role, email, employee_password, phone_number, cpf, level_access, company_id, address_id)
-    VALUES ("{employee.first_name}",
-    "{employee.surname}",
-    "{employee.birthdate}",
-    "{employee.employee_role}",
-    "{employee.email}",
-    "{employee.employee_password}",
-    "{phone_tratado}",
-    "{cpf_tratado}",
-    "{employee.level_access}",
-    "{employee.company_id}",
-    "{employee.address_id}"
-    )
-    """
+        query = f""" INSERT into Employee(first_name, surname, birthdate, employee_role, email, employee_password, phone_number, cpf, level_access, company_id, address_id)
+        VALUES ("{employee.first_name}",
+        "{employee.surname}",
+        "{employee.birthdate}",
+        "{employee.employee_role}",
+        "{employee.email}",
+        "{employee.employee_password}",
+        "{phone_tratado}",
+        "{cpf_tratado}",
+        "{employee.level_access}",
+        "{employee.company_id}",
+        "{employee.address_id}"
+        )
+        """
 
-    cursor.execute(query)
-    connection.commit()
+        cursor.execute(query)
+        connection.commit()
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
 
-    return employee
+        return employee
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def getAll():
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    query = f"""SELECT * from Employee
-    """
+        query = f"""SELECT id, first_name, surname, birthdate, employee_role, email, employee_password, phone_number, cpf, level_access, company_id, address_id from Employee
+        """
 
-    cursor.execute(query)
+        cursor.execute(query)
+        
+        emplyee_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return emplyee_list
     
-    emplyee_list = cursor.fetchall()
-
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
-
-    return emplyee_list
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def getOne(id: int):
+        
+    try:
+        connection, cursor = connect_database()
 
-    connection, cursor = connect_database()
+        query = f"""SELECT id, first_name, surname, birthdate, employee_role, email, employee_password, phone_number, cpf, level_access, company_id, address_id from Employee
+        WHERE id={id}
+        """
 
-    query = f"""SELECT * from Employee
-    WHERE id={id}
-    """
+        cursor.execute(query)
+        
+        employee_list = cursor.fetchall()
 
-    cursor.execute(query)
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return employee_list
     
-    employee_list = cursor.fetchall()
-
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
-
-    return employee_list
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def getEmployeeInfo(id: int):
 
-    connection, cursor = connect_database()
+    try:
 
-    query = f"""SELECT CONCAT(e.first_name," ",e.surname) as full_name, 
-    e.cpf, 
-    e.employee_role, 
-    e.birthdate, 
-    e.email, 
-    e.phone_number, 
-    a.street, 
-    a.zipcode, 
-    a.city, 
-    a.state
-    FROM Employee e
-    INNER JOIN Address a
-    ON e.address_id = a.id
-    WHERE e.id={id}
-    """
+        connection, cursor = connect_database()
 
-    cursor.execute(query)
+        query = f"""SELECT CONCAT(e.first_name," ",e.surname) as full_name, 
+        e.cpf, 
+        e.birthdate, 
+        e.employee_role, 
+        e.email, 
+        e.phone_number, 
+        a.zipcode, 
+        a.state,
+        a.city, 
+        a.street,
+        a.num,
+        a.complement,
+        t.welcome_kit_id,
+        t.status,
+        t.tracking_code
+        FROM Employee e
+        INNER JOIN Address a
+        ON e.address_id = a.id
+        INNER JOIN Tracking t
+        ON e.id = t.employee_id
+        WHERE e.id={id}
+        """
+
+        cursor.execute(query)
+        
+        employee_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return employee_list
     
-    employee_list = cursor.fetchall()
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+def getAllEmployeeInfo():
+        
+    try:
+        connection, cursor = connect_database()
 
-    return employee_list
+        query = f"""SELECT CONCAT(e.first_name," ",e.surname) as full_name, 
+        e.cpf, 
+        e.birthdate, 
+        e.employee_role, 
+        e.email, 
+        e.phone_number, 
+        a.zipcode, 
+        a.state,
+        a.city, 
+        a.street,
+        a.num,
+        a.complement,
+        t.welcome_kit_id,
+        t.status,
+        t.tracking_code
+        FROM Employee e
+        INNER JOIN Address a
+        ON e.address_id = a.id
+        INNER JOIN Tracking t
+        ON e.id = t.employee_id
+        """
+
+        cursor.execute(query)
+        
+        employee_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return employee_list
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def updateEmployee(id: int, employee: EmployeeUpdate):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    cpf = employee.cpf
-    cpf_tratado = cpf.replace(".","").replace("-","")
+        cpf = employee.cpf
+        cpf_tratado = cpf.replace(".","").replace("-","")
 
-    phone = employee.phone_number
-    phone_tratado = phone.replace("+","").replace("(", "").replace(")","").replace("-","")
+        phone = employee.phone_number
+        phone_tratado = phone.replace("+","").replace("(", "").replace(")","").replace("-","")
 
-    query = f"""UPDATE Employee
-    SET first_name="{employee.first_name}",
-    surname="{employee.surname}",
-    birthdate="{employee.birthdate}",
-    employee_role="{employee.employee_role}",
-    email="{employee.email}",
-    employee_password="{employee.employee_password}",
-    phone_number="{phone_tratado}",
-    cpf="{cpf_tratado}",
-    level_access="{employee.level_access}",
-    company_id={employee.company_id},
-    address_id={employee.address_id}
-    WHERE id={id}
-    """
+        query = f"""UPDATE Employee
+        SET first_name="{employee.first_name}",
+        surname="{employee.surname}",
+        birthdate="{employee.birthdate}",
+        employee_role="{employee.employee_role}",
+        email="{employee.email}",
+        employee_password="{employee.employee_password}",
+        phone_number="{phone_tratado}",
+        cpf="{cpf_tratado}",
+        level_access="{employee.level_access}",
+        company_id={employee.company_id},
+        address_id={employee.address_id}
+        WHERE id={id}
+        """
 
-    cursor.execute(query)
-    connection.commit()
+        cursor.execute(query)
+        connection.commit()
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
 
-    return id, employee
+        return id, employee
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def updateEmployeeLogin(id: int, employee: EmployeeUpdateLogin):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    query = f"""UPDATE Employee
-    SET
-    email="{employee.email}",
-    employee_password="{employee.employee_password}"
-    WHERE id={id}
-    """
+        query = f"""UPDATE Employee
+        SET
+        email="{employee.email}",
+        employee_password="{employee.employee_password}"
+        WHERE id={id}
+        """
 
-    cursor.execute(query)
-    connection.commit()
+        cursor.execute(query)
+        connection.commit()
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
 
-    return id, employee
+        return id, employee
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def updateEmployeeInfo(id: int, employee: EmployeeUpdateInfo):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    cpf = employee.cpf
-    cpf_tratado = cpf.replace(".","").replace("-","")
+        cpf = employee.cpf
+        cpf_tratado = cpf.replace(".","").replace("-","")
 
-    phone = employee.phone_number
-    phone_tratado = phone.replace("+","").replace("(", "").replace(")","").replace("-","")
+        phone = employee.phone_number
+        phone_tratado = phone.replace("+","").replace("(", "").replace(")","").replace("-","")
 
-    zipcode = employee.zipcode
-    zipcode_tratado = zipcode.replace("-","")
+        zipcode = employee.zipcode
+        zipcode_tratado = zipcode.replace("-","")
 
-    query = f"""UPDATE Employee e
-    INNER JOIN Address a
-    ON e.address_id = a.id
-    SET
-    e.first_name="{employee.first_name}",
-    e.surname="{employee.surname}",
-    e.cpf="{cpf_tratado}",
-    e.employee_role="{employee.employee_role}",
-    e.birthdate="{employee.birthdate}",
-    e.email="{employee.email}",
-    e.phone_number="{phone_tratado}",
-    a.street="{employee.street}",
-    a.zipcode="{zipcode_tratado}",
-    a.city="{employee.city}", 
-    a.state="{employee.state}"
-    WHERE e.id={id}
-    """
+        query = f"""UPDATE Employee e
+        INNER JOIN Address a
+        ON e.address_id = a.id
+        INNER JOIN Tracking t
+        ON e.id = t.employee_id
+        SET
+        e.first_name="{employee.first_name}",
+        e.surname="{employee.surname}",
+        e.cpf="{cpf_tratado}",
+        e.birthdate="{employee.birthdate}",
+        e.employee_role="{employee.employee_role}",
+        e.email="{employee.email}",
+        e.phone_number="{phone_tratado}",
+        a.zipcode="{zipcode_tratado}",
+        a.state="{employee.state}",
+        a.city="{employee.city}", 
+        a.street="{employee.street}",
+        a.num="{employee.num}",
+        a.complement="{employee.complement}",
+        t.tracking_code="{employee.tracking_code}",
+        t.status="{employee.status}"
+        WHERE e.id={id}
+        """
 
-    cursor.execute(query)
-    connection.commit()
+        cursor.execute(query)
+        connection.commit()
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
 
-    return id, employee
+        return id, employee
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def deleteEmployee(id: int):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    query = f"""DELETE FROM Employee WHERE id={id};
-    """
+        query = f"""DELETE FROM Employee WHERE id={id};
+        """
 
-    cursor.execute(query)
-    connection.commit()
+        cursor.execute(query)
+        connection.commit()
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
 
-    return id
+        return id
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 

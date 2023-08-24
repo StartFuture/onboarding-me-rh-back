@@ -24,12 +24,12 @@ def create_WK_WKItem(wk_wkitem_info: WelcomeKit_WKItem = Body(description="Assoc
     wk_item_list = getOneItem(wk_wkitem_info.item_id)
 
     if wk_list:
-        print(wk_list)
+        pass
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Welcome Kit Id doesn't exist"})
     
     if wk_item_list:
-        print(wk_item_list)
+        pass
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Item Id doesn't exist"}) 
 
