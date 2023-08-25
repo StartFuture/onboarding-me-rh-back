@@ -67,11 +67,14 @@ def updateCompany(id: int, company: CompanyUpdate):
 
     connection, cursor = connect_database()
 
+    cnpj = company.cnpj
+    cnpj_tratado = cnpj.replace(".", "").replace("/","").replace("-","")
+
     query = f"""UPDATE Company
     SET company_name="{company.company_name}",
     trading_name="{company.trading_name}",
     logo={company.logo},
-    cnpj="{company.cnpj}",
+    cnpj="{cnpj_tratado}",
     email="{company.email}",
     company_password="{company.company_password}",
     state_register="{company.state_register}" 
