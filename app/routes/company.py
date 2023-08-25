@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status, HTTPException, Path
-from app.dao.dao_company import createCompany, getAll, getOne, updateCompany, updateCompanyLogin, deleteCompany
+from app.dao import dao_company as daoCompany
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from app.schemas.company import Company, CompanyUpdate, CompanyUpdateLogin
+from app.schemas import company as schemas_company
 
 router = APIRouter(
     prefix="/company",
@@ -12,8 +12,8 @@ router = APIRouter(
 )
     
 @router.post('/create-company/')
-def create_company(company_info: Company):
-    company_list = getAll()
+def create_company(company_info: schemas_company.Company):
+    company_list = daoCompany.getAll()
 
     if company_info.company_name == "":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Company Name")
@@ -28,31 +28,33 @@ def create_company(company_info: Company):
         elif (company_info.cnpj == company['cnpj']):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="CNPJ already exists")
         
-    company = createCompany(company_info)
+    company = daoCompany.createCompany(company_info)
     company_json = jsonable_encoder(company)
     return JSONResponse(status_code=status.HTTP_200_OK, content=company_json)
 
 @router.get('/getall-company/')
 def getAll_company():
-    company_list = getAll()
+    company_list = daoCompany.getAll()
     if company_list:
-        return company_list
+        company_json = jsonable_encoder(company_list)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=company_json)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
     
 @router.get('/getone-company/{company_id}')
 def get_company(company_id: int = Path(description="The ID of the Company")):
-    company_list = getOne(company_id)
+    company_list = daoCompany.getOne(company_id)
 
     if company_list:
-        return company_list
+        company_json = jsonable_encoder(company_list)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=company_json)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
     
 
 @router.put('/update-company/{company_id}')
-def update_company(company_id: int, company_info: CompanyUpdate):
-    company_listOne = getOne(company_id)
+def update_company(company_id: int, company_info: schemas_company.CompanyUpdate):
+    company_listOne = daoCompany.getOne(company_id)
 
     if company_info.company_name == None:
         company_info.company_name = company_listOne[0]['company_name']
@@ -75,7 +77,7 @@ def update_company(company_id: int, company_info: CompanyUpdate):
     if company_info.state_register == None:
         company_info.state_register = company_listOne[0]['state_register']
 
-    company_listAll = getAll()
+    company_listAll = daoCompany.getAll()
 
     for company in company_listAll:
         if (company_info.email == company['email']):
@@ -83,13 +85,13 @@ def update_company(company_id: int, company_info: CompanyUpdate):
         elif (company_info.cnpj == company['cnpj']):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="CNPJ already exists")
 
-    company = updateCompany(company_id, company_info)
+    company = daoCompany.updateCompany(company_id, company_info)
     company_json = jsonable_encoder(company)
     return JSONResponse(status_code=status.HTTP_200_OK, content=company_json)
 
 @router.put('/update-companyLogin/{company_id}')
-def update_companyLogin(company_id: int, company_info: CompanyUpdateLogin):
-    company_listOne = getOne(company_id)
+def update_companyLogin(company_id: int, company_info: schemas_company.CompanyUpdateLogin):
+    company_listOne = daoCompany.getOne(company_id)
 
     if company_info.email == None:
         company_info.email = company_listOne[0]['email']
@@ -97,7 +99,7 @@ def update_companyLogin(company_id: int, company_info: CompanyUpdateLogin):
     if company_info.company_password == None:
         company_info.company_password = company_listOne[0]['company_password']
 
-    company_listAll = getAll()
+    company_listAll = daoCompany.getAll()
 
     for company in company_listAll:
         if (company_info.email == company['email']):
@@ -105,17 +107,17 @@ def update_companyLogin(company_id: int, company_info: CompanyUpdateLogin):
         elif (company_info.company_password == company['company_password']):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password already exists")
 
-    company = updateCompanyLogin(company_id, company_info)
+    company = daoCompany.updateCompanyLogin(company_id, company_info)
     return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"Login from Company ID {company_id} updated"})
 
 @router.delete('/delete-company/{company_id}')
 def delete_company(company_id: int):
 
-    company_list = getOne(company_id)
+    company_list = daoCompany.getOne(company_id)
 
     if len(company_list) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
     else:
-        deleteCompany(company_id)
+        daoCompany.deleteCompany(company_id)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"ID {company_id} deleted"})

@@ -1,16 +1,18 @@
 
 from app.dao.dao import connect_database
-from app.schemas.welcome_kit_item import WelcomeKitItem
+from app.schemas.tracking import Tracking, TrackingUpdate
 from mysql.connector import Error
 
-def createWelcomeKitItem(welcome_kit_item: WelcomeKitItem):
+def createTracking(tracking: Tracking):
 
     try:
         connection, cursor = connect_database()
 
-        query = f""" INSERT into WelcomeKitItem(name, image)
-        VALUES ("{welcome_kit_item.name}",
-        "{welcome_kit_item.image}"
+        query = f""" INSERT into Tracking(tracking_code, status, employee_id, welcome_kit_id)
+        VALUES ("{tracking.tracking_code}",
+        "{tracking.status}",
+        "{tracking.employee_id}",
+        "{tracking.welcome_kit_id}"
         )
         """
 
@@ -21,28 +23,28 @@ def createWelcomeKitItem(welcome_kit_item: WelcomeKitItem):
             cursor.close()
             connection.close()
 
-        return welcome_kit_item
+        return tracking
     
     except Error as erro:
         return {"Error: {}".format(erro)}
-
+    
 def getAll():
 
     try:
         connection, cursor = connect_database()
 
-        query = f"""SELECT id, name, image from WelcomeKitItem
+        query = f"""SELECT id, tracking_code, status, employee_id, welcome_kit_id from Tracking
         """
 
         cursor.execute(query)
         
-        welcome_kit_item_list = cursor.fetchall()
+        tracking_list = cursor.fetchall()
 
         if (connection.is_connected()):
             cursor.close()
             connection.close()
 
-        return welcome_kit_item_list
+        return tracking_list
     
     except Error as erro:
         return {"Error: {}".format(erro)}
@@ -52,31 +54,31 @@ def getOne(id: int):
     try:
         connection, cursor = connect_database()
 
-        query = f"""SELECT id, name, image from WelcomeKitItem
+        query = f"""SELECT id, tracking_code, status, employee_id, welcome_kit_id from Tracking
         WHERE id={id}
         """
 
         cursor.execute(query)
         
-        welcome_kit_item_list = cursor.fetchall()
+        tracking_list = cursor.fetchall()
 
         if (connection.is_connected()):
             cursor.close()
             connection.close()
 
-        return welcome_kit_item_list
+        return tracking_list
     
     except Error as erro:
         return {"Error: {}".format(erro)}
 
-def updateWelcomeKitItem(id: int, welcome_kit_item: WelcomeKitItem):
+def updateTracking(id: int, tracking: TrackingUpdate):
 
     try:
         connection, cursor = connect_database()
 
-        query = f"""UPDATE WelcomeKitItem
-        SET name="{welcome_kit_item.name}",
-        image="{welcome_kit_item.image}"
+        query = f"""UPDATE Tracking
+        SET tracking_code="{tracking.tracking_code}",
+        status="{tracking.status}"
         WHERE id={id}
         """
 
@@ -87,17 +89,17 @@ def updateWelcomeKitItem(id: int, welcome_kit_item: WelcomeKitItem):
             cursor.close()
             connection.close()
 
-        return id, welcome_kit_item
+        return id, tracking
     
     except Error as erro:
         return {"Error: {}".format(erro)}
 
-def deleteWelcomeKitItem(id: int):
+def deleteTracking(id: int):
 
     try:
         connection, cursor = connect_database()
 
-        query = f"""DELETE FROM WelcomeKitItem WHERE id={id};
+        query = f"""DELETE FROM Tracking WHERE id={id};
         """
 
         cursor.execute(query)
@@ -111,4 +113,3 @@ def deleteWelcomeKitItem(id: int):
     
     except Error as erro:
         return {"Error: {}".format(erro)}
-
