@@ -1,8 +1,9 @@
-from fastapi import APIRouter, status, HTTPException, Path
+from fastapi import APIRouter, Depends, status, HTTPException, Path
 from fastapi.encoders import jsonable_encoder
 from app.dao import dao_welcome_kit as daoWelcomeKit
 from fastapi.responses import JSONResponse
 from app.schemas import welcome_kit as schemas_wk
+from fastapi_pagination import Page, Params, paginate
 
 
 router = APIRouter(
@@ -40,7 +41,6 @@ def get_WK(welcome_kit_id: int = Path(description="The ID of the Welcome Kit")):
         return JSONResponse(status_code=status.HTTP_200_OK, content=wk_json)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
-    
 
 @router.put('/update-welcome-kit/{welcome_kit_id}')
 def update_WK(welcome_kit_id: int, welcome_kit_info: schemas_wk.WelcomeKit):
@@ -67,3 +67,12 @@ def delete_WK(welcome_kit_id: int):
         daoWelcomeKit.deleteWelcomeKit(welcome_kit_id)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"ID {welcome_kit_id} deleted"})
+
+@router.get('/get-wk-page', response_model=Page[schemas_wk.WelcomeKit])
+def get_Wk_Page(params: Params = Depends()):
+    welcome_kit_list = daoWelcomeKit.getAll()
+
+    wk_paginate = paginate(welcome_kit_list, params)
+    wk_paginate_json = jsonable_encoder(wk_paginate)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=wk_paginate_json)
+    
