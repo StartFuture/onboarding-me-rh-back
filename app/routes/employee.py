@@ -1,5 +1,5 @@
-from fastapi import APIRouter, status, HTTPException, Path
-from app.dao.dao_employee import createEmployee, getAll, getOne, updateEmployee, updateEmployeeLogin, deleteEmployee
+from fastapi import APIRouter, Query, status, HTTPException, Path
+from app.dao.dao_employee import createEmployee, getAll, getOne, getAllPaginated, getByNameOrCPF, updateEmployee, updateEmployeeLogin, deleteEmployee, getAllOderByCpfOrNamePaginated
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from app.schemas.employee import Employee, EmployeeUpdate, EmployeeUpdateLogin
@@ -59,7 +59,36 @@ def get_employee(employee_id: int = Path(description="The ID of the Employee")):
         return employee_list
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+    
+@router.get('/getbynameorcpf-employee/')
+def get_employee(employee_name: str = Query(default=None, description="The name of the Employee"), #tirar required
+                 employee_surname: str = Query(default=None, description="The surname of the Employee"), 
+                 employee_cpf: str = Query(default=None, description="The CPF of the Employee")):
+    employee_list = getByNameOrCPF(employee_name, employee_surname, employee_cpf)
 
+    if employee_list:
+        return employee_list
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+
+@router.get('/getall-employee-paginated/')
+def getAll_employee_paginated(page: int):
+    employee_list = getAllPaginated(page)
+    if employee_list:
+        return employee_list
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+
+@router.get('/getall-employee-order-by-cpf-name-paginated/')
+def getAll_employee_paginated(page: int,
+                name: bool = Query(default=False, description="The name of the Employee"), 
+                cpf: bool = Query(default=False, description="The CPF of the Employee")):
+    employee_list = getAllOderByCpfOrNamePaginated(page, cpf, name)
+    if employee_list:
+        return employee_list
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+    
 
 @router.put('/update-employee/{employee_id}')
 def update_employee(employee_id: int, employee_info: EmployeeUpdate):

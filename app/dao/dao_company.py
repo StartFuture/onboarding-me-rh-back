@@ -63,6 +63,24 @@ def getOne(id: int):
 
     return company_list
 
+def getLogobyId(id: int):
+
+    connection, cursor = connect_database()
+
+    query = f"""SELECT logo from Company
+    WHERE id={id}
+    """
+
+    cursor.execute(query)
+    
+    company_list = cursor.fetchall()
+
+    if (connection.is_connected()):
+        cursor.close()
+        connection.close()
+
+    return company_list
+
 def updateCompany(id: int, company: CompanyUpdate):
 
     connection, cursor = connect_database()
