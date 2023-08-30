@@ -111,3 +111,53 @@ def deleteWelcomeKit(id: int):
     
     except Error as erro:
         return {"Error: {}".format(erro)}
+    
+
+def getAllPaginated(page: int):
+
+    try:
+        limit: int = 5
+        page = page -1
+        offset: int = page*limit
+
+        connection, cursor = connect_database()
+
+        query = f"""SELECT id, name, image FROM WelcomeKit
+                    LIMIT {limit} OFFSET {offset};
+        """
+
+        cursor.execute(query)
+        
+        emplyee_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return emplyee_list
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
+    
+def getWkByName(name: str = None):
+
+    try:
+        connection, cursor = connect_database()
+
+        if name != None:
+            query = f"""SELECT id, name, image FROM WelcomeKit
+            WHERE WelcomeKit.name = '{name}';
+            """
+
+        cursor.execute(query)
+        
+        welcome_kit_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return welcome_kit_list
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}

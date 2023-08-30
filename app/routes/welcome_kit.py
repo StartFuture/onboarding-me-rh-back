@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Path
+from fastapi import APIRouter, Depends, Query, status, HTTPException, Path
 from fastapi.encoders import jsonable_encoder
 from app.dao import dao_welcome_kit as daoWelcomeKit
 from fastapi.responses import JSONResponse
@@ -68,11 +68,34 @@ def delete_WK(welcome_kit_id: int):
 
     return JSONResponse(status_code=status.HTTP_200_OK, content={"Success" : f"ID {welcome_kit_id} deleted"})
 
-@router.get('/get-wk-page', response_model=Page[schemas_wk.WelcomeKit])
-def get_Wk_Page(params: Params = Depends()):
-    welcome_kit_list = daoWelcomeKit.getAll()
+@router.get('/getall-wk-paginated/')
+def getAll_wk_paginated(page: int):
+    welcome_kit_list = daoWelcomeKit.getAllPaginated(page)
+    if welcome_kit_list:
+        wk_paginate_json = jsonable_encoder(welcome_kit_list)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=wk_paginate_json)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+    
+@router.get('/get-wk-byname')
+def get_wk_byname(name: str = Query(default=None, description="The name of the Welcome Kit")):
+    welcome_kit_list = daoWelcomeKit.getWkByName(name)
 
-    wk_paginate = paginate(welcome_kit_list, params)
-    wk_paginate_json = jsonable_encoder(wk_paginate)
-    return JSONResponse(status_code=status.HTTP_200_OK, content=wk_paginate_json)
+    if welcome_kit_list:
+        wk_json = jsonable_encoder(welcome_kit_list)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=wk_json)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+
+@router.get('/filter-wk-byname')
+def filter_wk_byname(name: str = Query(default=None, description="The name of the Welcome Kit")):
+    welcome_kit_listAll = daoWelcomeKit.getAll()
+    
+    welcome_kit_list = list(filter(lambda obj: name.lower() in obj['name'].lower(), welcome_kit_listAll))
+
+    if welcome_kit_list:
+        wk_json = jsonable_encoder(welcome_kit_list)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=wk_json)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
     
