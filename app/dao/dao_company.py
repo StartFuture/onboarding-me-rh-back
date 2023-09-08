@@ -1,67 +1,80 @@
 from app.dao.dao import connect_database
 from app.schemas.company import Company, CompanyUpdate, CompanyUpdateLogin
+from mysql.connector import Error
 
 def createCompany(company: Company):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    cnpj = company.cnpj
-    cnpj_tratado = cnpj.replace(".", "").replace("/","").replace("-","")
+        cnpj = company.cnpj
+        cnpj_tratado = cnpj.replace(".", "").replace("/","").replace("-","")
 
-    query = f""" INSERT into Company(company_name, trading_name, logo, cnpj, email, company_password, state_register)
-    VALUES ("{company.company_name}",
-    "{company.trading_name}",
-    "{company.logo}",
-    "{cnpj_tratado}",
-    "{company.email}",
-    "{company.company_password}",
-    "{company.state_register}"
-    )
-    """
+        query = f""" INSERT into Company(company_name, trading_name, logo, cnpj, email, company_password, state_register)
+        VALUES ("{company.company_name}",
+        "{company.trading_name}",
+        "{company.logo}",
+        "{cnpj_tratado}",
+        "{company.email}",
+        "{company.company_password}",
+        "{company.state_register}"
+        )
+        """
 
-    cursor.execute(query)
-    connection.commit()
+        cursor.execute(query)
+        connection.commit()
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
 
-    return company
+        return company
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def getAll():
 
-    connection, cursor = connect_database()
+    try: 
+        connection, cursor = connect_database()
 
-    query = f"""SELECT * from Company
-    """
+        query = f"""SELECT id, company_name, trading_name, logo, cnpj, email, company_password, state_register from Company
+        """
 
-    cursor.execute(query)
+        cursor.execute(query)
+        
+        company_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return company_list
     
-    company_list = cursor.fetchall()
-
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
-
-    return company_list
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def getOne(id: int):
+    try:
 
-    connection, cursor = connect_database()
+        connection, cursor = connect_database()
 
-    query = f"""SELECT * from Company
-    WHERE id={id}
-    """
+        query = f"""SELECT id, company_name, trading_name, logo, cnpj, email, company_password, state_register from Company
+        WHERE id={id}
+        """
 
-    cursor.execute(query)
+        cursor.execute(query)
+        
+        company_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return company_list
     
-    company_list = cursor.fetchall()
-
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
-
-    return company_list
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def getLogobyId(id: int):
 
@@ -83,63 +96,78 @@ def getLogobyId(id: int):
 
 def updateCompany(id: int, company: CompanyUpdate):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    query = f"""UPDATE Company
-    SET company_name="{company.company_name}",
-    trading_name="{company.trading_name}",
-    logo={company.logo},
-    cnpj="{company.cnpj}",
-    email="{company.email}",
-    company_password="{company.company_password}",
-    state_register="{company.state_register}" 
-    WHERE id={id}
-    """
+        cnpj = company.cnpj
+        cnpj_tratado = cnpj.replace(".", "").replace("/","").replace("-","")
 
-    cursor.execute(query)
-    connection.commit()
+        query = f"""UPDATE Company
+        SET company_name="{company.company_name}",
+        trading_name="{company.trading_name}",
+        logo={company.logo},
+        cnpj="{cnpj_tratado}",
+        email="{company.email}",
+        company_password="{company.company_password}",
+        state_register="{company.state_register}" 
+        WHERE id={id}
+        """
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        cursor.execute(query)
+        connection.commit()
 
-    return id, company
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return id, company
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def updateCompanyLogin(id: int, company: CompanyUpdateLogin):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    query = f"""UPDATE Company
-    SET
-    email="{company.email}",
-    company_password="{company.company_password}"
-    WHERE id={id}
-    """
+        query = f"""UPDATE Company
+        SET
+        email="{company.email}",
+        company_password="{company.company_password}"
+        WHERE id={id}
+        """
 
-    print(query)
+        print(query)
 
-    cursor.execute(query)
-    connection.commit()
+        cursor.execute(query)
+        connection.commit()
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
 
-    return id, company
+        return id, company
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def deleteCompany(id: int):
 
-    connection, cursor = connect_database()
+    try:
+        connection, cursor = connect_database()
 
-    query = f"""DELETE FROM Company WHERE id={id};
-    """
+        query = f"""DELETE FROM Company WHERE id={id};
+        """
 
-    cursor.execute(query)
-    connection.commit()
+        cursor.execute(query)
+        connection.commit()
 
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
 
-    return id
+        return id
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 

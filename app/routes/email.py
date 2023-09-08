@@ -1,6 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks
-from app.schemas.email import EmailSchema
-from app.dao.dao_email import conf
+from app.schemas import email as schemas_email
+from app.dao import dao_email as daoEmail
 from starlette.responses import JSONResponse
 from fastapi_mail import FastMail, MessageSchema, MessageType
 
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 @router.post("/email")
-async def simple_send(email: EmailSchema) -> JSONResponse:
+async def simple_send(email: schemas_email.EmailSchema) -> JSONResponse:
     html = """<p>Hi this test mail, thanks for using Fastapi-mail</p> """
 
     message = MessageSchema(
@@ -22,14 +22,14 @@ async def simple_send(email: EmailSchema) -> JSONResponse:
         body=html,
         subtype=MessageType.html)
 
-    fm = FastMail(conf)
+    fm = FastMail(daoEmail.conf)
     await fm.send_message(message)
     return JSONResponse(status_code=200, content={"message": "email has been sent"})
 
 @router.post("/emailbackground")
 async def send_in_background(
     background_tasks: BackgroundTasks,
-    email: EmailSchema
+    email: schemas_email.EmailSchema
     ) -> JSONResponse:
 
     message = MessageSchema(
@@ -38,7 +38,7 @@ async def send_in_background(
         body="Simple background task",
         subtype=MessageType.plain)
 
-    fm = FastMail(conf)
+    fm = FastMail(daoEmail.conf)
 
     background_tasks.add_task(fm.send_message,message)
 
