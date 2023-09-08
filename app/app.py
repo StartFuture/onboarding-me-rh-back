@@ -6,6 +6,7 @@ from app.routes.company import router as router_company
 from app.routes.email import router as router_email
 from app.routes.welcome_kit import router as router_welcome_kit
 from app.routes.welcome_kit_item import router as router_welcome_kit_item
+from app.routes.expiring_link import router as router_expiring_link
 from app.routes.welcome_kit_wk_item import router as router_welcome_kit_wk_item
 from app.routes.address import router as router_address
 from app.routes.tracking import router as router_tracking
@@ -36,6 +37,7 @@ app.include_router(router=router_company)
 app.include_router(router=router_email)
 app.include_router(router=router_welcome_kit)
 app.include_router(router=router_welcome_kit_item)
+app.include_router(router=router_expiring_link)
 app.include_router(router=router_welcome_kit_wk_item)
 app.include_router(router=router_address)
 app.include_router(router=router_tracking)

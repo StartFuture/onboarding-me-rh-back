@@ -76,6 +76,24 @@ def getOne(id: int):
     except Error as erro:
         return {"Error: {}".format(erro)}
 
+def getLogobyId(id: int):
+
+    connection, cursor = connect_database()
+
+    query = f"""SELECT logo from Company
+    WHERE id={id}
+    """
+
+    cursor.execute(query)
+    
+    company_list = cursor.fetchall()
+
+    if (connection.is_connected()):
+        cursor.close()
+        connection.close()
+
+    return company_list
+
 def updateCompany(id: int, company: CompanyUpdate):
 
     try:

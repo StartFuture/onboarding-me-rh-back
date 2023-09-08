@@ -61,6 +61,26 @@ def getAll():
     except Error as erro:
         return {"Error: {}".format(erro)}
 
+def getAllPaginated(page: int):
+    page = page -1
+    offset: int = page*10
+
+    connection, cursor = connect_database()
+
+    query = f"""SELECT * FROM Employee
+                LIMIT 10 OFFSET {offset};
+    """
+
+    cursor.execute(query)
+    
+    emplyee_list = cursor.fetchall()
+
+    if (connection.is_connected()):
+        cursor.close()
+        connection.close()
+
+    return emplyee_list
+
 def getOne(id: int):
         
     try:
@@ -164,6 +184,56 @@ def getAllEmployeeInfo():
     
     except Error as erro:
         return {"Error: {}".format(erro)}
+
+def getByNameOrCPF(name: str = None, surname: str = None, cpf: str = None):
+
+    connection, cursor = connect_database()
+
+    if name != None and surname != None:
+        query = f"""SELECT * from Employee
+        WHERE Employee.first_name = '{name}' and Employee.surname = '{surname}';
+        """
+
+    if cpf != None:
+        query = f"""SELECT * from Employee
+        WHERE cpf={cpf}
+        """
+    cursor.execute(query)
+    
+    employee_list = cursor.fetchall()
+
+    if (connection.is_connected()):
+        cursor.close()
+        connection.close()
+
+    return employee_list
+
+def getAllOderByCpfOrNamePaginated(page: int, cpf: bool = False, name: bool = False):
+    page = page -1
+    offset: int = page*10
+
+    connection, cursor = connect_database()
+
+    if cpf == True:
+        query = f"""SELECT * FROM Employee ORDER BY cpf
+                    LIMIT 10 OFFSET {offset};
+        """
+
+    if name == True:
+        query = f"""SELECT * FROM Employee ORDER BY first_name
+                    LIMIT 10 OFFSET {offset};
+        """
+
+    cursor.execute(query)
+    
+    emplyee_list = cursor.fetchall()
+
+    if (connection.is_connected()):
+        cursor.close()
+        connection.close()
+
+    return emplyee_list
+
 
 def updateEmployee(id: int, employee: EmployeeUpdate):
 

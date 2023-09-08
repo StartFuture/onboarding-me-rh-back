@@ -73,7 +73,36 @@ def get_employee_info(employee_id: int):
         return JSONResponse(status_code=status.HTTP_200_OK, content=employee_json)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+    
+@router.get('/getbynameorcpf-employee/')
+def get_employee(employee_name: str = Query(default=None, description="The name of the Employee"), #tirar required
+                 employee_surname: str = Query(default=None, description="The surname of the Employee"), 
+                 employee_cpf: str = Query(default=None, description="The CPF of the Employee")):
+    employee_list = daoEmployee.getByNameOrCPF(employee_name, employee_surname, employee_cpf)
 
+    if employee_list:
+        return employee_list
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+
+@router.get('/getall-employee-paginated/')
+def getAll_employee_paginated(page: int):
+    employee_list = daoEmployee.getAllPaginated(page)
+    if employee_list:
+        return employee_list
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+
+@router.get('/getall-employee-order-by-cpf-name-paginated/')
+def getAll_employee_paginated(page: int,
+                name: bool = Query(default=False, description="The name of the Employee"), 
+                cpf: bool = Query(default=False, description="The CPF of the Employee")):
+    employee_list = daoEmployee.getAllOderByCpfOrNamePaginated(page, cpf, name)
+    if employee_list:
+        return employee_list
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+    
 
 @router.put('/update-employee/{employee_id}')
 def update_employee(employee_id: int, employee_info: schemas_employee.EmployeeUpdate):
