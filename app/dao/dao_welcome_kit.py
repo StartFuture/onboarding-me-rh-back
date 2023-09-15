@@ -9,12 +9,11 @@ def createWelcomeKit(welcome_kit: WelcomeKit):
         connection, cursor = connect_database()
 
         query = f""" INSERT into WelcomeKit(name, image)
-        VALUES ("{welcome_kit.name}",
-        "{welcome_kit.image}"
-        )
+        VALUES (%s, %s)
         """
 
-        cursor.execute(query)
+        cursor.execute(query, (welcome_kit.name, welcome_kit.image))
+
         connection.commit()
 
         if (connection.is_connected()):
@@ -74,13 +73,14 @@ def updateWelcomeKit(id: int, welcome_kit: WelcomeKit):
     try:
         connection, cursor = connect_database()
 
-        query = f"""UPDATE WelcomeKit
-        SET name="{welcome_kit.name}",
-        image="{welcome_kit.image}"
-        WHERE id={id}
+        query = f""" UPDATE WelcomeKit
+        SET name="%s",
+        image="%s"
+        WHERE id=%s
         """
 
-        cursor.execute(query)
+        cursor.execute(query, (welcome_kit.name, welcome_kit.image, id))
+
         connection.commit()
 
         if (connection.is_connected()):
@@ -116,7 +116,7 @@ def deleteWelcomeKit(id: int):
 def getAllPaginated(page: int):
 
     try:
-        limit: int = 5
+        limit: int = 6
         page = page -1
         offset: int = page*limit
 

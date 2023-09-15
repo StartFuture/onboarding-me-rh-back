@@ -5,7 +5,6 @@ from fastapi.responses import JSONResponse
 from app.schemas import welcome_kit as schemas_wk
 from fastapi_pagination import Page, Params, paginate
 
-
 router = APIRouter(
     prefix="/welcome-kit",
     tags=[
