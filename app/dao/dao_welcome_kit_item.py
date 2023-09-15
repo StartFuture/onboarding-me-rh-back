@@ -9,12 +9,10 @@ def createWelcomeKitItem(welcome_kit_item: WelcomeKitItem):
         connection, cursor = connect_database()
 
         query = f""" INSERT into WelcomeKitItem(name, image)
-        VALUES ("{welcome_kit_item.name}",
-        "{welcome_kit_item.image}"
-        )
+        VALUES (%s, %s)
         """
 
-        cursor.execute(query)
+        cursor.execute(query, (welcome_kit_item.name, welcome_kit_item.image))
         connection.commit()
 
         if (connection.is_connected()):
@@ -74,13 +72,13 @@ def updateWelcomeKitItem(id: int, welcome_kit_item: WelcomeKitItem):
     try:
         connection, cursor = connect_database()
 
-        query = f"""UPDATE WelcomeKitItem
-        SET name="{welcome_kit_item.name}",
-        image="{welcome_kit_item.image}"
-        WHERE id={id}
+        query = f""" UPDATE WelcomeKitItem
+        SET name="%s",
+        image="%s"
+        WHERE id=%s
         """
 
-        cursor.execute(query)
+        cursor.execute(query, (welcome_kit_item.name, welcome_kit_item.image, id))
         connection.commit()
 
         if (connection.is_connected()):
