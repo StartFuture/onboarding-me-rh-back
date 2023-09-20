@@ -16,11 +16,18 @@ def createWelcomeKit(welcome_kit: WelcomeKit):
 
         connection.commit()
 
+        query = f"""SELECT LAST_INSERT_ID() as id FROM WelcomeKit
+        """
+
+        cursor.execute(query)
+
+        wk_id = cursor.fetchone()
+
         if (connection.is_connected()):
             cursor.close()
             connection.close()
 
-        return welcome_kit
+        return wk_id
 
     except Error as erro:
         return {"Error: {}".format(erro)}
