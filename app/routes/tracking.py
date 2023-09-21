@@ -53,6 +53,16 @@ def get_tracking(tracking_id: int = Path(description="The ID of the Tracking")):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
     
+@router.get('/get-tracking-by-employee/{employee_id}')
+def get_tracking(employee_id: int = Path(description="The ID of the Employee")):
+    tracking_list = daoTracking.getOnebyEmployee(employee_id)
+
+    if tracking_list:
+        tracking_json = jsonable_encoder(tracking_list)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=tracking_json)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+    
 
 @router.put('/update-tracking/{tracking_id}')
 def update_tracking(tracking_id: int, tracking_info: schemas_tracking.TrackingUpdate):

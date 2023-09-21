@@ -70,6 +70,28 @@ def getOne(id: int):
     
     except Error as erro:
         return {"Error: {}".format(erro)}
+    
+def getOnebyEmployee(id: int):
+
+    try:
+        connection, cursor = connect_database()
+
+        query = f"""SELECT id, tracking_code, status, employee_id, welcome_kit_id from Tracking
+        WHERE employee_id={id}
+        """
+
+        cursor.execute(query)
+        
+        tracking_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return tracking_list
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def updateTracking(id: int, tracking: TrackingUpdate):
 
