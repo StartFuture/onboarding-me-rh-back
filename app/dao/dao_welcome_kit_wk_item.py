@@ -1,16 +1,15 @@
 
 from app.dao.dao import connect_database
-from app.schemas.welcome_kit_wk_item import WelcomeKit_WKItem
 from mysql.connector import Error
 
-def createWelcomeKit_WKItem(welcome_kit_wkitem: WelcomeKit_WKItem):
+def createWelcomeKit_WKItem(welcome_kit_id, item_id):
 
     try:
         connection, cursor = connect_database()
 
         query = f""" INSERT into WelcomeKit_WelcomeKitItem(welcome_kit_id, item_id)
-        VALUES ("{welcome_kit_wkitem.welcome_kit_id}",
-        "{welcome_kit_wkitem.item_id}"
+        VALUES ("{welcome_kit_id}",
+        "{item_id}"
         )
         """
 
@@ -21,8 +20,7 @@ def createWelcomeKit_WKItem(welcome_kit_wkitem: WelcomeKit_WKItem):
             cursor.close()
             connection.close()
 
-        return welcome_kit_wkitem
+        return {welcome_kit_id, item_id}
     
     except Error as erro:
         return {"Error: {}".format(erro)}
-

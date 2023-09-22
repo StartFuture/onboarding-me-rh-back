@@ -3,7 +3,10 @@ from fastapi.encoders import jsonable_encoder
 from app.dao import dao_address as daoAddress
 from fastapi.responses import JSONResponse
 from app.schemas import address as schemas_address
-
+from app.schemas import employee as schemas_employee
+from app.schemas import tracking as schemas_tracking
+from app.dao.dao_employee import createEmployee
+from app.dao.dao_tracking import createTracking
 
 router = APIRouter(
     prefix="/address",
@@ -13,7 +16,10 @@ router = APIRouter(
 )
     
 @router.post('/create-address/')
-def create_address(address_info: schemas_address.Address):
+def create_address(address_info: schemas_address.Address,
+                   employee_info: schemas_employee.Employee, 
+                   tracking_info: schemas_tracking.Tracking
+                ):
 
     if address_info.num == "":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Number")
@@ -29,6 +35,17 @@ def create_address(address_info: schemas_address.Address):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing State")
     
     address = daoAddress.createAddress(address_info)
+    
+    try:
+        employee = createEmployee(employee_info, address['address_id'])
+    except:
+        print("error em createEmployee")
+    
+    try:
+        createTracking(tracking_info, employee['employee_id'])
+    except:
+        print("erro em createTracking")
+
     address_json = jsonable_encoder(address)
     return JSONResponse(status_code=status.HTTP_200_OK, content=address_json)
 

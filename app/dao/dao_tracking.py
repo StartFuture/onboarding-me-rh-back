@@ -3,7 +3,7 @@ from app.dao.dao import connect_database
 from app.schemas.tracking import Tracking, TrackingUpdate
 from mysql.connector import Error
 
-def createTracking(tracking: Tracking):
+def createTracking(tracking: Tracking, employee_id):
 
     try:
         connection, cursor = connect_database()
@@ -11,7 +11,7 @@ def createTracking(tracking: Tracking):
         query = f""" INSERT into Tracking(tracking_code, status, employee_id, welcome_kit_id)
         VALUES ("{tracking.tracking_code}",
         "{tracking.status}",
-        "{tracking.employee_id}",
+        "{employee_id}",
         "{tracking.welcome_kit_id}"
         )
         """

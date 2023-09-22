@@ -19,12 +19,12 @@ class Employee(BaseModel):
     birthdate: date
     employee_role: str
     email: EmailStr
-    employee_password: str
+    employee_password: str = Field(default='123456')
     phone_number: Optional[str] = Field(pattern=r"^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})\-?(\d{4}))$")
     cpf: str = Field(pattern=r"^([0-9]){3}\.?([0-9]){3}\.?([0-9]){3}-?([0-9]){2}$")
     level_access: LevelAccessEnum = LevelAccessEnum.default
-    company_id: int
-    address_id: int
+    company_id: int = 1
+    address_id: Optional[int] = None
 
 class EmployeeUpdate(BaseModel):
     first_name: Optional[str]

@@ -8,9 +8,9 @@ class StatusEnum(str, Enum):
     delivered = 'delivered'
 
 class Tracking(BaseModel):
-    tracking_code: str
+    tracking_code: str = "tracking"
     status: StatusEnum = StatusEnum.to_be_send
-    employee_id: int
+    employee_id: Optional[int] = None
     welcome_kit_id: int
 
 class TrackingUpdate(BaseModel):

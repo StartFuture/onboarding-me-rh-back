@@ -2,7 +2,7 @@ from app.dao.dao import connect_database
 from app.schemas.employee import Employee, EmployeeUpdate, EmployeeUpdateLogin, EmployeeUpdateInfo
 from mysql.connector import Error
 
-def createEmployee(employee: Employee):
+def createEmployee(employee: Employee, address_id):
 
     try:
         connection, cursor = connect_database()
@@ -24,18 +24,24 @@ def createEmployee(employee: Employee):
         "{cpf_tratado}",
         "{employee.level_access}",
         "{employee.company_id}",
-        "{employee.address_id}"
+        "{address_id}"
         )
+        """
+        cursor.execute(query)
+        connection.commit()
+
+        query = f"""SELECT LAST_INSERT_ID() as employee_id FROM Employee
         """
 
         cursor.execute(query)
-        connection.commit()
+
+        employee_id = cursor.fetchone()
 
         if (connection.is_connected()):
             cursor.close()
             connection.close()
 
-        return employee
+        return employee_id
     
     except Error as erro:
         return {"Error: {}".format(erro)}

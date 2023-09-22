@@ -23,12 +23,18 @@ def createAddress(address: Address):
         cursor.execute(query)
         connection.commit()
 
+        query = f"""SELECT LAST_INSERT_ID() as address_id FROM Address
+        """
+
+        cursor.execute(query)
+
+        address_id = cursor.fetchone()
 
         if (connection.is_connected()):
             cursor.close()
             connection.close()
 
-        return address
+        return address_id
     
     except Error as erro:
         return {"Error: {}".format(erro)}
