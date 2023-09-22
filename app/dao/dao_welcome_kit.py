@@ -16,11 +16,18 @@ def createWelcomeKit(welcome_kit: WelcomeKit):
 
         connection.commit()
 
+        query = f"""SELECT LAST_INSERT_ID() as id FROM WelcomeKit
+        """
+
+        cursor.execute(query)
+
+        wk_id = cursor.fetchone()
+
         if (connection.is_connected()):
             cursor.close()
             connection.close()
 
-        return welcome_kit
+        return wk_id
 
     except Error as erro:
         return {"Error: {}".format(erro)}
@@ -50,20 +57,39 @@ def getOne(id: int):
 
     try:
         connection, cursor = connect_database()
+        
+        query = f""" SELECT
+        wk.id as wk_id, 
+        wk.name as wk_name, 
+        wk.image as wk_image
+        FROM WelcomeKit wk
+        WHERE wk.id={id}
+        """
 
-        query = f"""SELECT id, name, image from WelcomeKit
-        WHERE id={id}
+        cursor.execute(query)
+        welcome_kit = cursor.fetchone()
+
+        query = f"""SELECT 
+        i.id,
+        i.name,
+        i.image
+        FROM WelcomeKit wk
+        INNER JOIN WelcomeKit_WelcomeKitItem link
+        ON wk.id = link.welcome_kit_id
+        INNER JOIN WelcomeKitItem i
+        ON i.id = link.item_id
+        WHERE wk.id={id}
         """
 
         cursor.execute(query)
         
-        welcome_kit_list = cursor.fetchall()
+        welcome_kit["wk_items"] = cursor.fetchall()
 
         if (connection.is_connected()):
             cursor.close()
             connection.close()
 
-        return welcome_kit_list
+        return welcome_kit
     
     except Error as erro:
         return {"Error: {}".format(erro)}

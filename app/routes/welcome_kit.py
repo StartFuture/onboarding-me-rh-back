@@ -4,6 +4,7 @@ from app.dao import dao_welcome_kit as daoWelcomeKit
 from fastapi.responses import JSONResponse
 from app.schemas import welcome_kit as schemas_wk
 from fastapi_pagination import Page, Params, paginate
+from app.routes.welcome_kit_wk_item import create_Link_WK_WKItem
 
 router = APIRouter(
     prefix="/welcome-kit",
@@ -19,6 +20,13 @@ def create_WK(wk_info: schemas_wk.WelcomeKit):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing Name")
     
     welcome_kit = daoWelcomeKit.createWelcomeKit(wk_info)
+
+    print(welcome_kit)
+    print(welcome_kit['id'])
+
+    for item in wk_info.wk_items:
+        create_Link_WK_WKItem(welcome_kit['id'], item.id)
+
     wk_json = jsonable_encoder(welcome_kit)
     return JSONResponse(status_code=status.HTTP_200_OK, content=wk_json)
 
@@ -34,6 +42,7 @@ def getAll_WK():
 @router.get('/getone-welcome-kit/{welcome_kit_id}')
 def get_WK(welcome_kit_id: int = Path(description="The ID of the Welcome Kit")):
     welcome_kit_list = daoWelcomeKit.getOne(welcome_kit_id)
+    
 
     if welcome_kit_list:
         wk_json = jsonable_encoder(welcome_kit_list)
