@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException, Path
+from fastapi import APIRouter, status, HTTPException, Path, Query
 from app.dao import dao_employee as daoEmployee
 from app.dao import dao_address as daoAddress
 from fastapi.encoders import jsonable_encoder
@@ -47,6 +47,15 @@ def create_employee(employee_info: schemas_employee.Employee):
 @router.get('/getall-employee/')
 def getAll_employee():
     employee_list = daoEmployee.getAll()
+    if employee_list:
+        employee_json = jsonable_encoder(employee_list)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=employee_json)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Nothing here"})
+    
+@router.get('/getall-employee-tracking/')
+def getAll_employee():
+    employee_list = daoEmployee.getAllWithTracking()
     if employee_list:
         employee_json = jsonable_encoder(employee_list)
         return JSONResponse(status_code=status.HTTP_200_OK, content=employee_json)

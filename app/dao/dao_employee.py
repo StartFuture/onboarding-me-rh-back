@@ -60,6 +60,44 @@ def getAll():
     
     except Error as erro:
         return {"Error: {}".format(erro)}
+    
+def getAllWithTracking():
+
+    try:
+        connection, cursor = connect_database()
+
+        query = f"""SELECT 
+        e.id, 
+        e.first_name, 
+        e.surname, 
+        e.birthdate, 
+        e.employee_role, 
+        e.email, 
+        e.phone_number, 
+        e.cpf, 
+        e.company_id, 
+        e.address_id,
+        t.id as tracking_id,
+        t.tracking_code,
+        t.status,
+        t.employee_id,
+        t.welcome_kit_id
+        from Employee e, Tracking t
+        where e.id = t.employee_id
+        """
+
+        cursor.execute(query)
+        
+        emplyee_list = cursor.fetchall()
+
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return emplyee_list
+    
+    except Error as erro:
+        return {"Error: {}".format(erro)}
 
 def getAllPaginated(page: int):
     page = page -1
